@@ -1,0 +1,25 @@
+:root {
+  height: 100%;
+}
+
+body {
+  background: linear-gradient(to top, #0ba360 0%, #3cba92 100%) no-repeat fixed;
+  display: grid;
+  grid-template: repeat(2, auto) / repeat(2, 1fr);
+  height: 100%;
+  margin: 0;
+}
+
+x-draggroup {
+  grid-area: 1 / 1 / 1/-1;
+  font: 22px 'Arial';
+}
+
+img {
+  height: 70%;
+  margin: 0 auto;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  width: 80%;
+}
