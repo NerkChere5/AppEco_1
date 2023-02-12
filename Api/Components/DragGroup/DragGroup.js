@@ -18,20 +18,43 @@ class DragGroup extends Component {
   _drop_zones = [];
   _drop_zones__container = null;
   _dropped_item = null;
+  _event_finally = null;
+  _group_item_count = {}
   _start_zone = null;
   _title_zone_template = null;
-
-
-
-
+  
+  
+  
+  
+  static #_solver(polygon) {
+    let drag_items = Array.from(polygon.querySelectorAll('.drag_item'));
+    let drop_zones = Array.from(polygon.querySelector('.drop_zones').children);
+    
+    for (let i = 0; i < drag_items.length - 1; i++) {
+      let drop_zone = drop_zones.find((item) => item.id == drag_items[i].dataset.groupId);
+      
+      if (!drop_zone) continue;
+      
+      drop_zone.append(drag_items[i]);
+    }
+  }
+  
+  
+  
+  
   async _build() {
     await super._build();
     
     this._drag_item__template = this._template.querySelector('.drag_item');
     this._drop_zone__template = this._template.querySelector('.drop_zone');
-    this._title_zone_template = this._template.querySelector('.title_zone');
-    this._start_zone = this._body.querySelector('.start_zone');
     this._drop_zones__container = this._body.querySelector('.drop_zones');
+    this._start_zone = this._body.querySelector('.start_zone');
+    this._title_zone_template = this._template.querySelector('.title_zone');
+    
+    this._event_finally = new Event('finally', {
+      bubbles: true,
+      composed: true,
+    });
     
     this.refrash();
   }
@@ -71,8 +94,6 @@ class DragGroup extends Component {
   
   
   _drop_zone__on_dragLeave(event) {
-    // if (this._dropped_item.parentElement == this._dragged_item.parentElement) return;
-    
     event.target.classList.remove('drop_zone__active');
   }
   
@@ -114,19 +135,20 @@ class DragGroup extends Component {
       let drop_zone = this._drop_zone__template.cloneNode(true);
       let group = this.children[i];
       let id = String(i + date.getTime());
+      let group_item = Array.from(group.children);
       
-      for (let child of Array.from(group.children)) {
+      this._group_item_count[id] = group_item.length;
+      
+      for (let child of group_item) {
         let drag_item = this._drag_item__template.cloneNode(true);
         
         drag_item.append(child);
         drag_item.dataset.groupId = id;
         this._drag_items.push(drag_item);
-        // this._start_zone.append(drag_item);
       }
       
       drop_zone.id = id;
       drop_zone.setAttribute('title', group.dataset.title || '');
-      // this._drop_zones__container.append(drop_zone);
       this._drop_zones.push(drop_zone);
     }
     
@@ -174,6 +196,8 @@ class DragGroup extends Component {
     else {
       event.target.append(this._dragged_item);
     }
+    
+    this._check_end();
   }
   
   
@@ -223,6 +247,17 @@ class DragGroup extends Component {
   }
   
   
+  _check_end() {
+    for (let i = 0; i < this._drop_zones.length - 1; i++) {
+      if (!(this._drop_zones[i].children.length == this._group_item_count[+this._drop_zones[i].id] && !this._drop_zones[i].querySelectorAll('[_error]').length)) return;
+    }
+    
+    this.dispatchEvent(this._event_finally);
+  }
+  
+  
+  
+  
   refrash() {
     this._insert_groups();
     
@@ -232,6 +267,8 @@ class DragGroup extends Component {
     this._drop_zones.push(this._start_zone);
     
     this._addEventsHandlers();
+    
+    // this.constructor.#_solver(this._body);
   }
 }
 

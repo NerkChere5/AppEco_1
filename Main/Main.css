@@ -23,3 +23,31 @@ img {
   user-select: none;
   width: 80%;
 }
+
+.finally {
+  display: none;
+  align-items: center;
+  background: linear-gradient(to top, #0ba360 0%, #3cba92 100%) no-repeat fixed;
+  /* display: grid; */
+  height: 100vh;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  /* grid-auto-flow: column; */
+  z-index: 1;
+  grid-template: 90px auto / 100%;
+}
+
+.finally_text {
+  font: 87px 'Arial';
+  text-align: center;
+  color: floralwhite;
+}
+
+.logo {
+  height: 80px;
+  justify-self: start;
+  margin: 0;
+  position: relative;
+  right: 35%;
+}
